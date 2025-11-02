@@ -2,10 +2,13 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { storage, parseJSONSafe, normalizeToken } from './helpers';
 
-// In production (Vercel), API is on same domain via routing
-// In development, use localhost:3000
+// API Base URL configuration
+// Production: uses separate backend URL
+// Development: uses localhost:3000
 const API_BASE_URL = import.meta.env.VITE_API_URL || 
-  (import.meta.env.MODE === 'production' ? '' : 'http://localhost:3000');
+  (import.meta.env.MODE === 'production' 
+    ? 'https://quiz-go-mantra-backend.vercel.app' 
+    : 'http://localhost:3000');
 
 // Create axios instance
 const api = axios.create({

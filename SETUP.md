@@ -52,8 +52,12 @@ LOG_LEVEL=info
 #### Frontend (`frontend/.env`)
 
 ```env
-VITE_API_URL=http://localhost:3000/api
+# Development
+VITE_API_URL=http://localhost:3000
 VITE_GOOGLE_CLIENT_ID=your-google-client-id
+
+# Production (set in Vercel)
+# VITE_API_URL=https://quiz-go-mantra-backend.vercel.app
 ```
 
 ### 3. Configure Google OAuth

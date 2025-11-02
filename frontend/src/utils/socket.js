@@ -6,7 +6,10 @@ export function createSocket(token) {
   if (socket) return socket;
 
   const auth = token ? { token } : {};
-  socket = io(import.meta.env.VITE_API_URL || 'http://localhost:3000', {
+  socket = io(import.meta.env.VITE_API_URL || 
+    (import.meta.env.MODE === 'production' 
+      ? 'https://quiz-go-mantra-backend.vercel.app' 
+      : 'http://localhost:3000'), {
     path: '/socket.io',
     transports: ['websocket'],
     auth,
