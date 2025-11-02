@@ -2,7 +2,10 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { storage, parseJSONSafe, normalizeToken } from './helpers';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+// In production (Vercel), API is on same domain via routing
+// In development, use localhost:3000
+const API_BASE_URL = import.meta.env.VITE_API_URL || 
+  (import.meta.env.MODE === 'production' ? '' : 'http://localhost:3000');
 
 // Create axios instance
 const api = axios.create({
