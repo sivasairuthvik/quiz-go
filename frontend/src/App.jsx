@@ -11,6 +11,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 const LoginPage = React.lazy(() => import('./pages/auth/LoginPage'));
 const AdminLoginPage = React.lazy(() => import('./pages/admin/AdminLoginPage'));
 const RegisterPage = React.lazy(() => import('./pages/auth/RegisterPage'));
+const AuthCallback = React.lazy(() => import('./pages/auth/AuthCallback'));
 const HomePage = React.lazy(() => import('./pages/home/HomePage'));
 const DashboardPage = React.lazy(() => import('./pages/dashboard/DashboardPage'));
 const ProfilePage = React.lazy(() => import('./pages/profile/ProfilePage'));
@@ -71,6 +72,7 @@ function App() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/admin" element={<AdminLoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
                 <Route path="/auth/success" element={<AuthSuccessPage />} />
                 {/* Protected routes wrapped in Layout */}
                 <Route path="/" element={<Layout />}>

@@ -16,10 +16,11 @@
 .dashboard-stat-value {
   font-size: 20px;
   font-weight: 700;
+  color: var(--surface-contrast);
 }
 .dashboard-stat-title {
   font-size: 12px;
-  color: #666;
+  color: #475569;
 }
 .dashboard-attempts-list {
   display: flex;
@@ -34,7 +35,7 @@
   padding: 8px 12px;
   border-radius: 6px;
   border: 1px solid #f0f0f0;
-  background: #fafafa;
+  background: #ffffff;
 }
 .attempt-left {
   display: flex;
@@ -42,20 +43,22 @@
 }
 .attempt-quiz {
   font-weight: 600;
+  color: var(--surface-contrast);
 }
 .attempt-user {
   font-size: 12px;
-  color: #666;
+  color: var(--muted-text);
 }
 .attempt-right {
   text-align: right;
 }
 .attempt-score {
   font-weight: 600;
+  color: var(--surface-contrast);
 }
 .attempt-date {
   font-size: 12px;
-  color: #777;
+  color: var(--muted-text);
 }
 .dashboard-error {
   color: #b00020;
@@ -69,12 +72,30 @@
 }
 
 /* Light card styling inside dashboard for a modern look */
-.dashboard .card {
+.dashboard .card,
+.dashboard-page .card {
   background: var(--surface-muted-bg);
   color: var(--surface-contrast);
   border: 1px solid rgba(15,23,42,0.06);
   box-shadow: 0 8px 24px rgba(2,6,23,0.06);
   border-radius: 12px;
+}
+
+/* Ensure headings and primary text on dashboard-page are readable */
+.dashboard-page h1,
+.dashboard-page h2,
+.dashboard-page h3,
+.dashboard-page p,
+.dashboard-page li,
+.dashboard-page .card__title,
+.dashboard-page .card__subtitle {
+  color: var(--surface-contrast);
+}
+
+/* Avoid inherited white text from .card affecting nested light blocks */
+.dashboard-page .dashboard-stat-card,
+.dashboard-page .dashboard-attempt {
+  color: var(--surface-contrast);
 }
 
 .dashboard-loading {

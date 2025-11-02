@@ -8,45 +8,37 @@
 
 
 
-.input {
+/* Field base styles (applied to actual input/textarea elements) */
+.input__wrapper {
+  position: relative;
   width: 100%;
-  padding: 10px 14px;
-  border-radius: 8px;
+}
+
+.input__field {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
   border: 1px solid var(--surface-border);
   background: var(--surface-bg);
   color: var(--surface-text);
   font-size: 15px;
   font-family: inherit;
-  transition: border 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
   outline: none;
-}
-.input:focus {
-  border-color: #1A90B5;
-  box-shadow: 0 0 0 2px rgba(26, 144, 181, 0.15);
-}
-.input--error {
-  border-color: #e53935;
-}
-.input--muted {
-  background: var(--surface-muted-bg);
-  color: var(--surface-contrast);
+  box-sizing: border-box;
 }
 
+.input__field::placeholder {
+  color: var(--muted-text);
+}
+
+.input__field:hover {
+  border-color: #cbd5e1; /* subtle hover */
+}
 
 .input__field:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.input__field:disabled {
-  background: var(--surface-muted-bg);
-  color: var(--muted-text);
-  cursor: not-allowed;
-}
-
-.input__field:read-only {
-  background: var(--surface-muted-bg);
-  cursor: default;
+  border-color: #1A90B5;
+  box-shadow: 0 0 0 3px rgba(26, 144, 181, 0.15);
 }
 
 .input__field--error {
@@ -55,7 +47,29 @@
 
 .input__field--error:focus {
   border-color: #ef4444;
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.input__field:disabled {
+  background: var(--surface-muted-bg);
+  color: var(--muted-text);
+  cursor: not-allowed;
+  border-color: #e5e7eb;
+}
+
+/* Autofill styles to keep consistent look */
+input.input__field:-webkit-autofill,
+textarea.input__field:-webkit-autofill,
+select.input__field:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px var(--surface-bg) inset;
+  -webkit-text-fill-color: var(--surface-text);
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+
+.input__field:read-only {
+  background: var(--surface-muted-bg);
+  cursor: default;
 }
 
 /* Size variants */

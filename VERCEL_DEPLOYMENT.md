@@ -69,13 +69,17 @@ VITE_COPILOT_PUBLIC_KEY=your-copilot-api-key
 
 Add these to your Google Cloud Console OAuth 2.0 credentials:
 
-1. Development:
+1. Development (localhost):
    - `http://localhost:5173/auth/callback`
    - `http://localhost:3000/api/auth/google/callback`
 
 2. Production:
    - `https://quiz-go-mantra.vercel.app/auth/callback`
    - `https://quiz-go-mantra-backend.vercel.app/api/auth/google/callback`
+
+**Note**: For local testing, make sure both frontend and backend are running:
+- Frontend: `http://localhost:5173` (cd frontend && npm run dev)
+- Backend: `http://localhost:3000` (cd backend && npm run dev)
 
 ---
 

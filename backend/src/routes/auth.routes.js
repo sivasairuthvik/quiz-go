@@ -251,6 +251,230 @@ router.post('/refresh', authLimiter, async (req, res, next) => {
   }
 });
 
+// GET /api/auth/google - Initiate Google OAuth flow
+router.get('/google', (req, res) => {
+  const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+  const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+  const BACKEND_URL = process.env.BACKEND_URL || `${req.protocol}://${req.get('host')}`;
+
+  if (!GOOGLE_CLIENT_ID) {
+    return res.status(500).json({ success: false, error: 'Google OAuth not configured' });
+  }
+
+  // Use backend callback to handle the token exchange server-side, then redirect to frontend with tokens
+  const redirectUri = `${BACKEND_URL}/api/auth/google/callback`;
+  const scope = 'openid email profile';
+  const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+    `client_id=${GOOGLE_CLIENT_ID}&` +
+    `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+    `response_type=code&` +
+    `scope=${encodeURIComponent(scope)}&` +
+    `access_type=offline&` +
+    `prompt=consent`;
+
+  res.redirect(googleAuthUrl);
+});
+
+// GET /api/auth/google/callback - Handle Google OAuth callback
+router.get('/google/callback', async (req, res) => {
+  const { code, error } = req.query;
+  const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+  if (error || !code) {
+    logger.error('Google OAuth error:', error);
+    return res.redirect(`${FRONTEND_URL}/login?error=${encodeURIComponent(error || 'auth_failed')}`);
+  }
+
+  try {
+    const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+    const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+    const redirectUri = `${FRONTEND_URL}/auth/callback`;
+
+    // Exchange code for tokens
+    const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code,
+        client_id: GOOGLE_CLIENT_ID,
+        client_secret: GOOGLE_CLIENT_SECRET,
+        redirect_uri: redirectUri,
+        grant_type: 'authorization_code',
+      }),
+    });
+
+    if (!tokenResponse.ok) {
+      const errorData = await tokenResponse.text();
+      logger.error('Token exchange failed:', errorData);
+      return res.redirect(`${FRONTEND_URL}/login?error=token_exchange_failed`);
+    }
+
+    const tokens = await tokenResponse.json();
+    const { id_token } = tokens;
+
+    // Verify and decode ID token
+    const userInfoResponse = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${id_token}`);
+    if (!userInfoResponse.ok) {
+      logger.error('Token verification failed');
+      return res.redirect(`${FRONTEND_URL}/login?error=token_verification_failed`);
+    }
+
+    const userInfo = await userInfoResponse.json();
+    
+    // Find or create user
+    let user = await User.findOne({ email: userInfo.email });
+
+    if (user) {
+      // Update existing user with Google data
+      if (!user.provider || user.provider === 'local') {
+        user.provider = 'google';
+        user.providerId = userInfo.sub;
+        user.providerData = userInfo;
+        user.emailVerified = true;
+      }
+      user.lastLogin = new Date();
+      await user.save();
+    } else {
+      // Create new user
+      user = await User.create({
+        email: userInfo.email,
+        name: userInfo.name || userInfo.email.split('@')[0],
+        profilePicture: userInfo.picture || '',
+        role: 'student',
+        provider: 'google',
+        providerId: userInfo.sub,
+        providerData: userInfo,
+        emailVerified: true,
+        lastLogin: new Date(),
+      });
+    }
+
+    // Generate tokens
+    const accessToken = generateAccessToken(user._id, user.role);
+    const refreshToken = generateRefreshToken(user._id);
+
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    // Redirect to frontend with tokens
+    const redirectUrl = `${FRONTEND_URL}/auth/callback?` +
+      `token=${accessToken}&` +
+      `refresh=${refreshToken}&` +
+      `user=${encodeURIComponent(JSON.stringify({
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        profilePicture: user.profilePicture
+      }))}`;
+
+    res.redirect(redirectUrl);
+  } catch (error) {
+    logger.error('Google OAuth callback error:', error);
+    res.redirect(`${FRONTEND_URL}/login?error=auth_failed`);
+  }
+});
+
+// POST /api/auth/google/exchange - Exchange authorization code for tokens (called by frontend)
+router.post('/google/exchange', async (req, res, next) => {
+  try {
+    const { code } = req.body;
+    const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+    if (!code) {
+      return res.status(400).json({ success: false, error: 'Authorization code is required' });
+    }
+
+    const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+    const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+    const redirectUri = `${FRONTEND_URL}/auth/callback`;
+
+    // Exchange code for tokens
+    const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code,
+        client_id: GOOGLE_CLIENT_ID,
+        client_secret: GOOGLE_CLIENT_SECRET,
+        redirect_uri: redirectUri,
+        grant_type: 'authorization_code',
+      }),
+    });
+
+    if (!tokenResponse.ok) {
+      const errorData = await tokenResponse.text();
+      logger.error('Token exchange failed:', errorData);
+      return res.status(401).json({ success: false, error: 'Token exchange failed' });
+    }
+
+    const tokens = await tokenResponse.json();
+    const { id_token } = tokens;
+
+    // Verify and decode ID token
+    const userInfoResponse = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${id_token}`);
+    if (!userInfoResponse.ok) {
+      logger.error('Token verification failed');
+      return res.status(401).json({ success: false, error: 'Token verification failed' });
+    }
+
+    const userInfo = await userInfoResponse.json();
+    
+    // Find or create user
+    let user = await User.findOne({ email: userInfo.email });
+
+    if (user) {
+      // Update existing user with Google data
+      if (!user.provider || user.provider === 'local') {
+        user.provider = 'google';
+        user.providerId = userInfo.sub;
+        user.providerData = userInfo;
+        user.emailVerified = true;
+      }
+      user.lastLogin = new Date();
+      await user.save();
+    } else {
+      // Create new user
+      user = await User.create({
+        email: userInfo.email,
+        name: userInfo.name || userInfo.email.split('@')[0],
+        profilePicture: userInfo.picture || '',
+        role: 'student',
+        provider: 'google',
+        providerId: userInfo.sub,
+        providerData: userInfo,
+        emailVerified: true,
+        lastLogin: new Date(),
+      });
+    }
+
+    // Generate our own tokens
+    const accessToken = generateAccessToken(user._id, user.role);
+    const refreshToken = generateRefreshToken(user._id);
+
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    res.json({
+      success: true,
+      data: {
+        user: {
+          id: user._id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          profilePicture: user.profilePicture
+        },
+        accessToken,
+        refreshToken
+      }
+    });
+  } catch (error) {
+    logger.error('Google OAuth exchange error:', error);
+    next(error);
+  }
+});
+
 // POST /api/auth/logout - Revoke refresh token
 router.post('/logout', authenticate, async (req, res, next) => {
   try {
@@ -266,6 +490,8 @@ router.post('/logout', authenticate, async (req, res, next) => {
     next(error);
   }
 });
+
+// (duplicate '/google/exchange' route removed to avoid conflicts)
 
 export default router;
 

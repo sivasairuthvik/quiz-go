@@ -229,16 +229,41 @@ html, body {
   width: 100%;
   padding: 12px 14px;
   border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.06);
-  background: rgba(255,255,255,0.02);
-  color: #e6eef8;
+  border: 1px solid #e2e8f0; /* light border */
+  background: #ffffff; /* light field for readability */
+  color: #0f172a; /* near-black text */
   box-sizing: border-box;
   outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.login-card__content input::placeholder,
+.login-card__content textarea::placeholder {
+  color: #6b7280; /* darker placeholder on light bg */
+}
+.login-card__content input:hover,
+.login-card__content textarea:hover {
+  border-color: #cbd5e1;
 }
 .login-card__content input:focus,
 .login-card__content textarea:focus {
-  border-color: rgba(26,144,181,0.9);
-  box-shadow: 0 4px 18px rgba(26,144,181,0.08);
+  border-color: #1A90B5;
+  box-shadow: 0 0 0 3px rgba(26,144,181,0.2);
+}
+.login-card__content input:disabled,
+.login-card__content textarea:disabled {
+  background: #f8fafc;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+.login-card__content input:invalid {
+  border-color: #ef4444;
+}
+/* Autofill */
+.login-card__content input:-webkit-autofill,
+.login-card__content textarea:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset;
+  -webkit-text-fill-color: #0f172a;
+  transition: background-color 5000s ease-in-out 0s;
 }
 .login-card__submit-btn {
   margin-top: 6px;
@@ -407,6 +432,53 @@ html, body {
   }
 }
 
+/* Google Login Button */
+.google-login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: white !important;
+  color: #3c4043 !important;
+  border: 1px solid #dadce0 !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.google-login-btn:hover {
+  background: #f8f9fa !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12) !important;
+}
+
+.google-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.login-card__divider {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+  text-align: center;
+  position: relative;
+}
+
+.login-card__divider::before,
+.login-card__divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.login-card__divider span {
+  padding: 0 16px;
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 500;
+}
+
 /* Accessibility */
 @media (prefers-reduced-motion: reduce) {
   .login-page__pattern,
@@ -438,4 +510,38 @@ html, body {
     background: rgba(255, 255, 255, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.5);
   }
+}
+
+/* Register section */
+.login-card__register {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  text-align: center;
+}
+
+.login-card__register p {
+  color: #cbd5e1;
+  font-size: 14px;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.login-card__register button {
+  color: #1A90B5 !important;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 0;
+  background: none !important;
+  border: none !important;
+  text-decoration: none;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.login-card__register button:hover {
+  color: #60d1f6 !important;
+  text-decoration: underline;
+  background: none !important;
+  transform: none;
 }

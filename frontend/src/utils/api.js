@@ -81,6 +81,7 @@ export const authAPI = {
   deleteAccount: () => api.delete('/api/users/me'),
   getAllUsers: (params) => api.get('/api/users', { params }),
   getUserById: (id) => api.get(`/api/users/${id}`),
+  createUser: (data) => api.post('/api/users', data),
   changeUserRole: (userId, role) => api.put(`/api/users/${userId}/role`, { role }),
 };
 
