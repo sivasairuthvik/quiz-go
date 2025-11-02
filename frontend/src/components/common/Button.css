@@ -1,0 +1,366 @@
+/* Button Styles */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+/* Button base styles for elements inside .btn */
+.btn .button {
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid #E6E6E6;
+  background: #1B1B1B;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.15s cubic-bezier(0.4,0,0.2,1);
+  outline: none;
+  font-family: inherit;
+}
+.btn .button:hover {
+  background: #1A90B5;
+  color: #FFFFFF;
+}
+.btn .button:active {
+  background: #156d8a;
+  transform: scale(0.96);
+}
+.btn .button[disabled], .btn .button.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.btn .button--primary {
+  background: #1A90B5;
+  color: #FFFFFF;
+  border: 1px solid #1A90B5;
+  box-shadow: 0 2px 8px rgba(26, 144, 181, 0.10);
+}
+.btn .button--primary:hover {
+  background: #156d8a;
+}
+.btn .button--secondary {
+  background: #000000;
+  color: #FFFFFF;
+  border: 1px solid #E6E6E6;
+}
+.btn .button--secondary:hover {
+  background: #1B1B1B;
+}
+.btn .button--accent {
+  background: #FFFFFF;
+  color: #1A90B5;
+  border: 1px solid #1A90B5;
+}
+.btn .button--accent:hover {
+  background: #E6E6E6;
+}
+.btn .button--fullWidth {
+  width: 100%;
+}
+.btn .button--sm {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+.btn .button--md {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+.btn .button--lg {
+  padding: 12px 24px;
+  font-size: 16px;
+}
+.btn .button--xl {
+  padding: 16px 32px;
+  font-size: 18px;
+}
+.btn .button--icon {
+  margin-right: 8px;
+  font-size: 1.2em;
+  vertical-align: middle;
+}
+.btn .button--loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+.btn .button--shadow {
+  box-shadow: 0 2px 8px rgba(26, 144, 181, 0.10);
+}
+.btn .button--rounded {
+  border-radius: 999px;
+}
+.btn .button--outline {
+  background: transparent;
+  color: #1A90B5;
+  border: 1px solid #1A90B5;
+}
+.btn .button--outline:hover {
+  background: #1A90B5;
+  color: #FFFFFF;
+}
+.btn .button--muted {
+  background: #E6E6E6;
+  color: #1B1B1B;
+  border: 1px solid #E6E6E6;
+}
+.btn .button--muted:hover {
+  background: #1B1B1B;
+  color: #FFFFFF;
+}
+
+.btn--ghost:hover:not(:disabled) {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.btn--danger {
+  background: #ef4444;
+  color: white;
+  border-color: transparent;
+}
+
+.btn--danger:hover:not(:disabled) {
+  background: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.btn--success {
+  background: #10b981;
+  color: white;
+  border-color: transparent;
+}
+
+.btn--success:hover:not(:disabled) {
+  background: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.btn--warning {
+  background: #f59e0b;
+  color: white;
+  border-color: transparent;
+}
+
+.btn--warning:hover:not(:disabled) {
+  background: #d97706;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+}
+
+/* Full width */
+.btn--full-width {
+  width: 100%;
+}
+
+/* Loading state */
+.btn--loading {
+  pointer-events: none;
+}
+
+.btn--loading .btn__text {
+  opacity: 0.7;
+}
+
+.btn__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Icon positioning */
+.btn__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.btn__icon--left {
+  margin-right: -2px;
+}
+
+.btn__icon--right {
+  margin-left: -2px;
+}
+
+/* Icon only button */
+.btn--icon-only {
+  padding: 10px;
+  aspect-ratio: 1;
+}
+
+.btn--icon-only.btn--xs {
+  padding: 4px;
+}
+
+.btn--icon-only.btn--sm {
+  padding: 6px;
+}
+
+.btn--icon-only.btn--md {
+  padding: 10px;
+}
+
+.btn--icon-only.btn--lg {
+  padding: 12px;
+}
+
+.btn--icon-only.btn--xl {
+  padding: 16px;
+}
+
+.btn--icon-only .btn__text {
+  display: none;
+}
+
+/* Screen reader only text */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Button Group */
+.btn-group {
+  display: inline-flex;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.btn-group .btn {
+  border-radius: 0;
+  border-right-width: 0;
+  margin: 0;
+  transform: none;
+}
+
+.btn-group .btn:first-child {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+.btn-group .btn:last-child {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  border-right-width: 1px;
+}
+
+.btn-group .btn:hover:not(:disabled) {
+  transform: none;
+  z-index: 1;
+  position: relative;
+}
+
+.btn-group .btn:focus {
+  z-index: 2;
+  position: relative;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .btn {
+    font-size: 14px;
+    padding: 10px 16px;
+  }
+  
+  .btn--sm {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+  
+  .btn--lg {
+    font-size: 15px;
+    padding: 12px 20px;
+  }
+  
+  .btn-group {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .btn-group .btn {
+    border-radius: 0;
+    border-right-width: 1px;
+    border-bottom-width: 0;
+    width: 100%;
+  }
+  
+  .btn-group .btn:first-child {
+    border-radius: 8px 8px 0 0;
+  }
+  
+  .btn-group .btn:last-child {
+    border-radius: 0 0 8px 8px;
+    border-bottom-width: 1px;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .btn__spinner {
+    animation: none;
+    transition: none;
+    transform: none;
+  }
+  
+  .btn:hover:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .btn {
+    border-width: 2px;
+  }
+  
+  .btn--ghost,
+  .btn--outline {
+    border-width: 2px;
+  }
+}
+
+/* Focus visible (when user navigates with keyboard) */
+.btn:focus-visible {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+.btn:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Print styles */
+@media print {
+  .btn {
+    background: white !important;
+    color: black !important;
+    border: 1px solid black !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+}

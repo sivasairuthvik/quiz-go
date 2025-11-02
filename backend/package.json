@@ -1,0 +1,46 @@
+{
+  "name": "quiz-mantra-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Quiz Mantra",
+  "type": "module",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "build": "echo 'Build not required for Node.js'",
+    "start": "node src/server.js",
+    "test": "jest",
+    "lint": "eslint src/",
+    "seed": "node src/scripts/seed.js",
+    "setup-env": "node setup-env.js",
+    "check-env": "node check-env.js",
+    "test-connection": "node test-connection.js",
+    "fix-indexes": "node scripts/fix-indexes.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^8.0.3",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "helmet": "^7.1.0",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "multer": "^1.4.5-lts.1",
+    "pdf-parse": "^1.1.1",
+    "@google/generative-ai": "^0.21.0",
+    "socket.io": "^4.6.1",
+    "mongodb": "^6.3.0",
+    "gridfs-stream": "^1.1.1",
+    "nodemailer": "^6.9.7",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "eslint": "^8.56.0",
+    "nodemon": "^3.0.2"
+  }
+}
+
+

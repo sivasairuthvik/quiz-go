@@ -1,0 +1,98 @@
+.profilePage {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+}
+
+.profileCard {
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  background: var(--surface-bg);
+  color: var(--surface-text);
+}
+
+.profileInfo {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--surface-muted-bg);
+  border: 2px solid var(--surface-border);
+  border: 2px solid var(--surface-border);
+}
+
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--surface-muted-bg);
+  border: 2px solid var(--surface-border);
+}
+
+.role {
+  font-size: 1rem;
+  color: var(--primary-600);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.profileDetails {
+  margin-top: 1rem;
+}
+
+.profileForm label {
+  display: block;
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+}
+
+.profileForm input,
+.profileForm textarea,
+.profileForm select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.25rem;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  font-size: 1rem;
+}
+
+.profileForm textarea {
+  min-height: 60px;
+}
+
+.formActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.deleteBtn {
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.success {
+  color: #10b981;
+  margin-bottom: 1rem;
+}
+
+.error {
+  color: #ef4444;
+  margin-bottom: 1rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--primary-600);
+}
