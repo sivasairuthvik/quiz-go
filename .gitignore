@@ -14,10 +14,16 @@ frontend/.vite/
 **/.vite/
 
 # Environment variables
+# Ignore all env files across the repo, but keep documented examples
 .env
 .env.local
 .env.*.local
-backend/.env
+.env*
+!*.env.example
+frontend/.env*
+!frontend/.env.example
+backend/.env*
+!backend/.env.example
 
 # Logs
 *.log

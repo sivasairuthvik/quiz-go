@@ -112,8 +112,8 @@ export const quizAPI = {
     }
 
     // Otherwise treat as quizId: start attempt then submit
-    const startRes = await api.post('/api/attempts/start', { quizId: quizOrAttemptId });
-    const attemptId = startRes.data?.data?.attempt?._id || startRes.data?.data?.attempt?.id || startRes.data?.data?.attempts?._id;
+  const startRes = await api.post('/api/attempts/start', { quizId: quizOrAttemptId });
+  let attemptId = startRes.data?.data?.attempt?._id || startRes.data?.data?.attempt?.id || startRes.data?.data?.attempts?._id;
     if (!attemptId && startRes.data?.data?._id) {
       // some responses may return attempt directly
       attemptId = startRes.data.data._id;
