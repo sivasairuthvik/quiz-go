@@ -10,14 +10,15 @@ const router = express.Router();
 // GET /api/reports/student/:id - Student performance report
 router.get('/student/:id', authenticate, apiLimiter, async (req, res, next) => {
   try {
-    const studentId = req.params.id === 'me' ? req.user._id : req.params.id;
+    // Normalize studentId to string when 'me' is used so comparisons work correctly
+    const studentId = req.params.id === 'me' ? req.user._id.toString() : req.params.id;
 
     // Students can only view their own reports
     if (req.user.role === 'student' && studentId !== req.user._id.toString()) {
       return res.status(403).json({ success: false, error: 'Not authorized' });
     }
 
-    // Teachers/admins can view any student
+    // Teachers/admins can view any student; students proceed when requesting their own id
     if (req.user.role !== 'student' || studentId === req.user._id.toString()) {
       const attempts = await Attempt.find({ studentId, is_submitted: true })
         .populate('quizId', 'title')

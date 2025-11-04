@@ -2,6 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import Quiz from '../models/Quiz.model.js';
 import Question from '../models/Question.model.js';
+import User from '../models/User.model.js';
 import { authenticate, authorize } from '../middleware/auth.middleware.js';
 import { apiLimiter, uploadLimiter } from '../middleware/rateLimiter.js';
 import pdfService from '../services/pdf.service.js';
@@ -18,10 +19,38 @@ router.get('/', authenticate, apiLimiter, async (req, res, next) => {
     const query = {};
 
     if (req.user.role === 'student') {
-      // Students see only published quizzes in their classes
+      // Students see published quizzes relevant to them:
+      // - published quizzes assigned to their classes (or the classId filter)
+      // - published quizzes created by admins (visible to all students)
+      // - published quizzes with no allowed_classes (public)
       query['settings.is_published'] = true;
+
+      // Build OR filters
+      const orFilters = [];
+
+      // If client requested a specific class, respect that
       if (classId) {
-        query['settings.allowed_classes'] = classId;
+        orFilters.push({ 'settings.allowed_classes': classId });
+      } else {
+        // Use classes from student's profile if available
+        const studentClasses = Array.isArray(req.user.classes) && req.user.classes.length > 0 ? req.user.classes : [];
+        if (studentClasses.length > 0) {
+          orFilters.push({ 'settings.allowed_classes': { $in: studentClasses } });
+        }
+      }
+
+      // Include quizzes with no allowed_classes (treat as public)
+      orFilters.push({ 'settings.allowed_classes': { $exists: true, $size: 0 } });
+
+      // Include published quizzes created by admins
+      const admins = await User.find({ role: 'admin' }).select('_id');
+      if (admins && admins.length > 0) {
+        const adminIds = admins.map((a) => a._id);
+        orFilters.push({ creatorId: { $in: adminIds } });
+      }
+
+      if (orFilters.length > 0) {
+        query.$or = orFilters;
       }
     } else if (req.user.role === 'teacher') {
       // Teachers see their own quizzes + published ones in their classes

@@ -29,6 +29,17 @@ api.interceptors.request.use(
       token = null;
     }
 
+    // Debug: show whether we have a token for this request (do not log full token in production)
+    try {
+      if (token) {
+        console.debug('[api] attaching token for', config.url, 'token present');
+      } else {
+        console.debug('[api] no token for', config.url);
+      }
+    } catch (e) {
+      // ignore console issues
+    }
+
     if (typeof token === 'string' && token.trim()) {
       config.headers.Authorization = `Bearer ${token}`;
     }

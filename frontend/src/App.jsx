@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import { QuizProvider } from './context/QuizContext';
@@ -31,17 +31,76 @@ const AdminAnalyticsPage = React.lazy(() => import('./pages/admin/AdminAnalytics
 const AdminSettingsPage = React.lazy(() => import('./pages/admin/AdminSettingsPage'));
 const NotFoundPage = React.lazy(() => import('./pages/error/NotFoundPage'));
 
+// Auth success page (lazy)
+const AuthSuccessPage = React.lazy(() => import('./pages/auth/AuthSuccessPage'));
+
 // Loading fallback component
 const SuspenseFallback = () => <Loading text="Loading page..." fullScreen />;
 
 function App() {
-  // ...existing code...
-  const AuthSuccessPage = React.lazy(() => import('./pages/auth/AuthSuccessPage'));
+  // App root — router is created below using lazy-loaded pages and suspense
+  // build the routes for createBrowserRouter so we can opt-in to future flags
+  const SuspenseElement = (Comp) => {
+    // Use createElement to avoid JSX parsing edge-cases in HMR
+    return React.createElement(
+      React.Suspense,
+      { fallback: React.createElement(SuspenseFallback) },
+      React.createElement(Comp)
+    );
+  };
+
+  const router = createBrowserRouter(
+    [
+      // Public routes
+      { path: '/', element: SuspenseElement(HomePage) },
+      { path: '/login', element: SuspenseElement(LoginPage) },
+      { path: '/admin', element: SuspenseElement(AdminLoginPage) },
+      { path: '/register', element: SuspenseElement(RegisterPage) },
+      { path: '/auth/callback', element: SuspenseElement(AuthCallback) },
+      { path: '/auth/success', element: SuspenseElement(AuthSuccessPage) },
+
+      // Protected routes wrapped in Layout
+      {
+        path: '/',
+        element: <Layout />,
+        children: [
+          { path: 'home', element: <Navigate to="/" replace /> },
+          { path: 'dashboard', element: <ProtectedRoute>{SuspenseElement(DashboardPage)}</ProtectedRoute> },
+          { path: 'profile', element: <ProtectedRoute>{SuspenseElement(ProfilePage)}</ProtectedRoute> },
+          { path: 'profile/:id', element: <ProtectedRoute>{SuspenseElement(ProfilePage)}</ProtectedRoute> },
+          { path: 'quizzes', element: <ProtectedRoute>{SuspenseElement(QuizzesPage)}</ProtectedRoute> },
+          { path: 'quizzes/create', element: <ProtectedRoute allowedRoles={["teacher", "admin"]}>{SuspenseElement(CreateQuizPage)}</ProtectedRoute> },
+          { path: 'quiz/create', element: <Navigate to="/quizzes/create" replace /> },
+          { path: 'quizzes/:id', element: <ProtectedRoute>{SuspenseElement(QuizDetailsPage)}</ProtectedRoute> },
+          { path: 'quizzes/:id/edit', element: <ProtectedRoute allowedRoles={["teacher", "admin"]}>{SuspenseElement(CreateQuizPage)}</ProtectedRoute> },
+          { path: 'quizzes/:id/take', element: <ProtectedRoute allowedRoles={["student"]}>{SuspenseElement(TakeQuizPage)}</ProtectedRoute> },
+          { path: 'submissions', element: <ProtectedRoute>{SuspenseElement(SubmissionsPage)}</ProtectedRoute> },
+          { path: 'submission/:id', element: <ProtectedRoute>{SuspenseElement(SubmissionDetailsPage)}</ProtectedRoute> },
+          { path: 'analytics', element: <ProtectedRoute allowedRoles={["teacher", "admin"]}>{SuspenseElement(AnalyticsPage)}</ProtectedRoute> },
+          { path: 'competitions', element: <ProtectedRoute>{SuspenseElement(CompetitionsPage)}</ProtectedRoute> },
+          { path: 'announcements', element: <ProtectedRoute allowedRoles={["teacher", "admin"]}>{SuspenseElement(AnnouncementsPage)}</ProtectedRoute> },
+          { path: 'messages', element: <ProtectedRoute>{SuspenseElement(MessagesPage)}</ProtectedRoute> },
+          { path: 'admin/dashboard', element: <ProtectedRoute allowedRoles={["admin"]}>{SuspenseElement(AdminDashboardPage)}</ProtectedRoute> },
+          { path: 'admin/users', element: <ProtectedRoute allowedRoles={["admin"]}>{SuspenseElement(AdminUsersPage)}</ProtectedRoute> },
+          { path: 'admin/analytics', element: <ProtectedRoute allowedRoles={["admin"]}>{SuspenseElement(AdminAnalyticsPage)}</ProtectedRoute> },
+          { path: 'admin/quizzes', element: <ProtectedRoute allowedRoles={["admin"]}>{SuspenseElement(QuizzesPage)}</ProtectedRoute> },
+          { path: 'admin/competitions', element: <ProtectedRoute allowedRoles={["admin"]}>{SuspenseElement(CompetitionsPage)}</ProtectedRoute> },
+          { path: 'admin/announcements', element: <ProtectedRoute allowedRoles={["admin"]}>{SuspenseElement(AnnouncementsPage)}</ProtectedRoute> },
+          { path: 'admin/messages', element: <ProtectedRoute allowedRoles={["admin"]}>{SuspenseElement(MessagesPage)}</ProtectedRoute> },
+          { path: 'admin/settings', element: <ProtectedRoute allowedRoles={["admin"]}>{SuspenseElement(AdminSettingsPage)}</ProtectedRoute> },
+          // 404 within protected area
+          { path: '*', element: SuspenseElement(NotFoundPage) },
+        ],
+      },
+    ],
+    // Opt-in to v7 future flags to avoid warnings & align with upcoming router behavior
+    { future: { v7_startTransition: true, v7_relativeSplatPath: true } }
+  );
+
   return (
     <AuthProvider>
       <QuizProvider>
-        <Router>
-          <div className="App">
+        <div className="App">
             {/* Toast notifications */}
             <Toaster
               position="top-right"
@@ -65,50 +124,9 @@ function App() {
                 }
               }}
             />
-            <React.Suspense fallback={<SuspenseFallback />}>
-              <Routes>
-                {/* Public routes */}
-                <Route path="/" element={<HomePage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/admin" element={<AdminLoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-                <Route path="/auth/callback" element={<AuthCallback />} />
-                <Route path="/auth/success" element={<AuthSuccessPage />} />
-                {/* Protected routes wrapped in Layout */}
-                <Route path="/" element={<Layout />}>
-                  {/* default inside layout is dashboard for authenticated navigation paths */}
-                  <Route path="home" element={<Navigate to="/" replace />} />
-                  <Route path="dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-                  <Route path="profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-                  <Route path="profile/:id" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-                  <Route path="quizzes" element={<ProtectedRoute><QuizzesPage /></ProtectedRoute>} />
-                  <Route path="quizzes/create" element={<ProtectedRoute allowedRoles={["teacher", "admin"]}><CreateQuizPage /></ProtectedRoute>} />
-                  {/* Alias for legacy path */}
-                  <Route path="quiz/create" element={<Navigate to="/quizzes/create" replace />} />
-                  <Route path="quizzes/:id" element={<ProtectedRoute><QuizDetailsPage /></ProtectedRoute>} />
-                  <Route path="quizzes/:id/edit" element={<ProtectedRoute allowedRoles={["teacher", "admin"]}><CreateQuizPage /></ProtectedRoute>} />
-                  <Route path="quizzes/:id/take" element={<ProtectedRoute allowedRoles={["student"]}><TakeQuizPage /></ProtectedRoute>} />
-                  <Route path="submissions" element={<ProtectedRoute><SubmissionsPage /></ProtectedRoute>} />
-                  <Route path="submission/:id" element={<ProtectedRoute><SubmissionDetailsPage /></ProtectedRoute>} />
-                  <Route path="analytics" element={<ProtectedRoute allowedRoles={["teacher", "admin"]}><AnalyticsPage /></ProtectedRoute>} />
-                  <Route path="competitions" element={<ProtectedRoute><CompetitionsPage /></ProtectedRoute>} />
-                  <Route path="announcements" element={<ProtectedRoute allowedRoles={["teacher", "admin"]}><AnnouncementsPage /></ProtectedRoute>} />
-                  <Route path="messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
-                  <Route path="admin/dashboard" element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboardPage /></ProtectedRoute>} />
-                  <Route path="admin/users" element={<ProtectedRoute allowedRoles={["admin"]}><AdminUsersPage /></ProtectedRoute>} />
-                  <Route path="admin/analytics" element={<ProtectedRoute allowedRoles={["admin"]}><AdminAnalyticsPage /></ProtectedRoute>} />
-                  <Route path="admin/quizzes" element={<ProtectedRoute allowedRoles={["admin"]}><QuizzesPage /></ProtectedRoute>} />
-                  <Route path="admin/competitions" element={<ProtectedRoute allowedRoles={["admin"]}><CompetitionsPage /></ProtectedRoute>} />
-                  <Route path="admin/announcements" element={<ProtectedRoute allowedRoles={["admin"]}><AnnouncementsPage /></ProtectedRoute>} />
-                  <Route path="admin/messages" element={<ProtectedRoute allowedRoles={["admin"]}><MessagesPage /></ProtectedRoute>} />
-                  <Route path="admin/settings" element={<ProtectedRoute allowedRoles={["admin"]}><AdminSettingsPage /></ProtectedRoute>} />
-                  {/* 404 route */}
-                  <Route path="*" element={<NotFoundPage />} />
-                </Route>
-              </Routes>
-            </React.Suspense>
+            {/* RouterProvider will render routes & children. Using RouterProvider lets us pass future flags during creation. */}
+            <RouterProvider router={router} />
           </div>
-        </Router>
       </QuizProvider>
     </AuthProvider>
   );

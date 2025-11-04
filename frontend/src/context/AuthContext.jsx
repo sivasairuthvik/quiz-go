@@ -193,6 +193,40 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Register new user (email/password)
+  const register = async (name, email, password) => {
+    try {
+      dispatch({ type: actionTypes.SET_LOADING, payload: true });
+      const response = await authAPI.register({ name, email, password });
+      if (response.data?.success) {
+        const { accessToken, refreshToken, user } = response.data.data;
+        const normalizedToken = normalizeToken(accessToken);
+
+        // Store tokens and user
+        storage.set('token', normalizedToken);
+        storage.set('refreshToken', refreshToken);
+        storage.set('user', user);
+
+        dispatch({
+          type: actionTypes.LOGIN_SUCCESS,
+          payload: { token: normalizedToken, user },
+        });
+
+        toast.success('Registration successful. Welcome!');
+        return { success: true, user };
+      }
+
+      dispatch({ type: actionTypes.LOGIN_FAILURE, payload: response.data?.error || 'Registration failed' });
+      return { success: false, error: response.data?.error || 'Registration failed' };
+    } catch (error) {
+      console.error('register error:', error);
+      dispatch({ type: actionTypes.LOGIN_FAILURE, payload: error.response?.data?.error || 'Registration failed' });
+      return { success: false, error: error.response?.data?.error || 'Registration failed' };
+    } finally {
+      dispatch({ type: actionTypes.SET_LOADING, payload: false });
+    }
+  };
+
   // Logout function
   const logout = async () => {
     try {
@@ -286,6 +320,7 @@ export const AuthProvider = ({ children }) => {
     
     // Actions
     login,
+    register,
     loginWithCredentials,
     logout,
     updateUser,

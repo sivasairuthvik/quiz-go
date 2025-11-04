@@ -22,12 +22,7 @@ const AdminLoginPage = () => {
     <div className="admin-login-page">
       <h2>Admin Login</h2>
       <p>Login with your admin Google account to access the dashboard.</p>
-      <a
-        className="google-login-btn"
-        href={window.location.origin.includes('3000') ? '/auth/google/admin' : '/api/auth/google/admin'}
-      >
-        Login with Google
-      </a>
+      <p>Admin login via Google has been disabled.</p>
       {error && <p className="error-msg">{error}</p>}
     </div>
   );
