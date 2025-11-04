@@ -56,7 +56,7 @@ const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
     origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     credentials: true,
   },
 });
@@ -76,10 +76,26 @@ app.use(helmet({
   },
 }));
 
+// Configure CORS with a whitelist and dynamic origin checking so deployed frontend
+// origins (Vercel) and localhost are allowed. Also allow common methods and headers.
+const whitelist = [process.env.FRONTEND_URL, 'http://localhost:5173', 'https://quiz-go-mantra.vercel.app'].filter(Boolean);
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: function(origin, callback) {
+    // Allow non-browser requests (e.g., server-side tools) when origin is undefined
+    if (!origin) return callback(null, true);
+    if (whitelist.indexOf(origin) !== -1) {
+      return callback(null, true);
+    }
+    return callback(new Error('CORS policy: origin not allowed'));
+  },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With'],
 }));
+// app.use(cors({
+//   origin: true,
+//   credentials: true,
+// }));
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
